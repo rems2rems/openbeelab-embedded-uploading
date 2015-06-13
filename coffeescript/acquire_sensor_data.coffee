@@ -1,4 +1,4 @@
-# Copyright 2012-2015 OpenBeeLab.
+# Copyright 2012-2014 OpenBeeLab.
 # This file is part of the OpenBeeLab project.
 
 # The OpenBeeLab project is free software: you can redistribute it and/or modify
@@ -13,3 +13,21 @@
 
 # You should have received a copy of the GNU General Public License
 # along with OpenBeeLab.  If not, see <http://www.gnu.org/licenses/>.
+
+
+device = require './pcduino_read_mock'
+#device = require './pcduino_read'
+#device = require './pcduino_read_with_python'
+#device = require './yun_read'
+
+require '../../util/javascript/numberUtils'
+    
+module.exports = (pin,callback)->
+
+    readPromise = device.read pin
+    readPromise.then (value)->
+        
+        callback(value)
+
+    .throw (e)->
+        console.log e
