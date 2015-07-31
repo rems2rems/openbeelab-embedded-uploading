@@ -63,13 +63,11 @@ api =
         # return value
 
     analogRead : (pin) ->
-        console.log "read!"
         return new Promise( (fulfill, reject)->
 
             #de 0 a 2013
             adcFile = "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
             fs.readFile adcFile, (err, data) ->
-                console.log "read ok"
                 if (err) 
                     reject(err)
                 console.log "data:" + data
