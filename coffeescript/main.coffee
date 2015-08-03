@@ -1,31 +1,30 @@
 
-dbDriver = require '../../dbUtil/javascript/dbUtil'
+dbDriver = require '../../openbeelab-db-util/javascript/dbUtil'
 dbConfig = require './config'
 db = dbDriver.database(dbConfig)
-acquire_sensor_data = require './acquire_sensor_data'
 insert_measure = require './insert_measure'
 insert_external_measure = require './insert_external_measure'
 
-Promise = require 'promise'
+#Promise = require 'promise'
 
-dbGet = Promise.denodeify db.get.bind(db)
+#dbGet = Promise.denodeify db.get.bind(db)
 
 apiary = null
 apiaryLocation = null
 
 apiariesUrl = '_design/apiaries/_view/by_name?key="'+ dbConfig.apiary_name+'"'
-apiariesPromise = dbGet apiariesUrl
+apiariesPromise = db.get apiariesUrl
 apiariesPromise.then (apiaries) ->
 
     apiary = apiares[0].value
-    return dbGet apiary.location_id
+    return db.get apiary.location_id
 
 .then (location) ->
 
     apiaryLocation = location
 
     beehousesUrl = '_design/beehouses/_view/by_apiary?key="'+apiary._id+'"'
-    return dbGet beehousesUrl
+    return db.get beehousesUrl
 
 .then (beehouses) ->
     
@@ -35,17 +34,18 @@ apiariesPromise.then (apiaries) ->
         beehouse = beehouse.value
 
         sensorsUrl = '_design/sensors/_view/by_beehouse?key="'+beehouse._id+'"'
-        sensorsPromise = dbGet sensorsUrl
+        sensorsPromise = db.get sensorsUrl
         sensorsPromise.then (sensors) ->
 
             for sensor in sensors
             
                 sensor = sensor.value
-
-                acquire_sensor_data sensor.pin,(value)->
+                device = require './devices/' + sensor["device"]
+                measurePromise = device.use(sensor)
+                measurePromise.then (value)->
 
                     console.log value
-                    insert_measure db,sensor,apiaryLocation,value, (err,msg)->
-                        console.log err
+                    insertPromise = insert_measure db,sensor,apiaryLocation,value
+                    insertPromise.then (msg)->
                         console.log msg
                         console.log "measure uploaded to db " + dbConfig.db

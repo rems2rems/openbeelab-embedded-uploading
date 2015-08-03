@@ -1,30 +1,25 @@
+Pin = require './pin'
+arietta = require './devices/arietta_g25'
 
-arietta = require 'aria_fox_gpio'
+directionPin = Pin.buildGpio(arietta,"pioB14")
+directionPin.setOutput()
+pulsePin = Pin.buildGpio(arietta,"pioB13")
+pulsePin.setOutput()
 
-Output = arietta({model: 'aria',debug: true}).OutGpio
+StepMotor = require('./stepMotor')
 
-led = new Output 'J4', 34, ()->
-    
-    #use callback to handle the init
-    console.log('init callback button #1')
+motor = StepMotor(directionPin,pulsePin)
 
-    isOn = false
-    setInterval ()->
-        isOn = !isOn
-        if (isOn)
-            led.setHigh()
-        else
-            led.setLow()
-    , 500
+motor.forward(100)
+motor.backward(100)
 
-#attach the init event fired (after the callback) when the led is ready 
-led.attach 'init', (event)->
-    console.log('init event button #1')
+searchEquilibrium = require 'romanScale'
 
-#attach the rising event fired when the led is turned on
-led.attach 'rising', (event)->
-    console.log('led is turned on')
+photoDiodeTop    = Pin.buildAdc(arietta,"in_voltage0_raw")
+photoDiodeBottom = Pin.buildAdc(arietta,"in_voltage1_raw")
 
-#attach the rising event fired when the led is turned off
-led.attach 'falling', (event)->
-    console.log('led is turned off')
+promise = searchEquilibrium(motor,photoDiodeTop,photoDiodeBottom)
+
+promise.then (nbSteps)->
+
+    console.log "nb steps to equilibrium:" + nbSteps

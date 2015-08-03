@@ -1,7 +1,10 @@
 #sh = require('execSync')
-fs = require 'fs'
+nodeFs = require 'fs'
 Promise = require 'promise'
-
+fs = 
+    readFile : Promise.denodeify nodeFs.readFile.bind(nodeFs)
+    writeFile : Promise.denodeify nodeFs.writeFile.bind(nodeFs)
+    
 # arietta = require 'aria_fox_gpio'
 
 # Output = arietta({model: 'aria',debug: true}).OutGpio
@@ -38,53 +41,48 @@ Promise = require 'promise'
 
 api =
 
+    export : (kernelId)->
+
+        fs.writeFile("/sys/class/gpio/export",kernelId)
+
+    teardown : (gpios)->
+
+        for pin in gpios
+
+            fs.writeFile("/sys/class/gpio/unexport",pin.kernelId)
+    
+    setDirection : (pinName,direction)->
+
+        fs.writeFile "sys/class/gpio/" + pin.name + "/direction",direction
+
+    setInputMode : (pinName)->
+
+        @setDirection pinName,"in"
+
+    setOutputMode : (pinName)->
+
+        @setDirection pinName,"out"    
+
     use : (sensor) ->
 
-        return @[sensor.measureType](sensor.pin)
+        return @[sensor.measureType](sensor.pinName)
 
-    digitalRead : (pin) ->
+    digitalRead : (pinName) ->
 
-        return new Promise( (fulfill, reject)->
+        return fs.readFile("/sys/class/gpio/" + pinName + "/value")
 
-            pinFile = "pin file..." + pin
-            fs.readFile adcFile, (err, data) ->
-                if (err) 
-                    throw err
+    digitalWrite : (pinName,value) ->
 
-                state = if data == 0 then "low" else "high"
-                fulfill(state)
-        )
+        return fs.writeFile("/sys/class/gpio/" + pinName + "/value",value)
 
-    digitalWrite : (pin,value) ->
+    analogRead : (adcName) ->
 
-        # command = 'python /home/ubuntu/openbeelab/openbeelab-embedded-uploading/write.py ' + pin
-        # result = sh.exec(command)
-        # value = parseInt(result.stdout)
-        # return value
-
-    analogRead : (pin) ->
-        return new Promise( (fulfill, reject)->
-
-            #de 0 a 2013
-            adcFile = "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
-            fs.readFile adcFile, (err, data) ->
-                if (err) 
-                    reject(err)
-                
-                fulfill(data)
-        )
-        
-
-        # command = 'python /home/ubuntu/openbeelab/openbeelab-embedded-uploading/arietta_readadc.py ' + sensor.pin
-        # result = sh.exec(command)
-        # value = parseInt(result.stdout)
-        # return value
+        return fs.readFile "/sys/bus/iio/devices/iio:device0/" + adcName
 
     planWakeup : (seconds) ->
 
-        command = 'echo "+ ' + seconds + '" > /sys/class/rtc/rtc0/wakealarm'
-        sh.exec(command)
-        
+        return fs.writeFile "/sys/class/rtc/rtc0/wakealarm",seconds
+
     sleep : () ->
 
         sh.exec("halt")
