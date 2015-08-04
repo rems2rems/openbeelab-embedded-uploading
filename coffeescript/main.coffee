@@ -1,51 +1,50 @@
 
 dbDriver = require '../../openbeelab-db-util/javascript/dbUtil'
-dbConfig = require './config'
-db = dbDriver.database(dbConfig)
+config = require './config'
+
+db = dbDriver.database(config)
+
 insert_measure = require './insert_measure'
-insert_external_measure = require './insert_external_measure'
 
-#Promise = require 'promise'
 
-#dbGet = Promise.denodeify db.get.bind(db)
-
-apiary = null
-apiaryLocation = null
-
-apiariesUrl = '_design/apiaries/_view/by_name?key="'+ dbConfig.apiary_name+'"'
-apiariesPromise = db.get apiariesUrl
-apiariesPromise.then (apiaries) ->
-
-    apiary = apiares[0].value
-    return db.get apiary.location_id
-
-.then (location) ->
-
-    apiaryLocation = location
-
-    beehousesUrl = '_design/beehouses/_view/by_apiary?key="'+apiary._id+'"'
-    return db.get beehousesUrl
-
-.then (beehouses) ->
+standUrl = '_design/stands/_view/by_name?key="'+config.stand_name+'"'
+db.get standUrl
+.then (stand) ->
     
-    console.log beehouses
-    for beehouse in beehouses
+    stand = stand[0].value
+    
+    device = require './devices/' + stand.device
+    
+    for sensor in stand.sensors
         
-        beehouse = beehouse.value
+        if not device[sensor.type]?
+            measure = require "./" + sensor.type
+        else
+            measure = device[sensor.type]
 
-        sensorsUrl = '_design/sensors/_view/by_beehouse?key="'+beehouse._id+'"'
-        sensorsPromise = db.get sensorsUrl
-        sensorsPromise.then (sensors) ->
+        measurePromise = measure(sensor,device)
+        measurePromise.then (value)->
 
-            for sensor in sensors
-            
-                sensor = sensor.value
-                device = require './devices/' + sensor["device"]
-                measurePromise = device.use(sensor)
-                measurePromise.then (value)->
+            console.log value
 
-                    console.log value
-                    insertPromise = insert_measure db,sensor,apiaryLocation,value
-                    insertPromise.then (msg)->
-                        console.log msg
-                        console.log "measure uploaded to db " + dbConfig.db
+            measure =
+                timestamp : new Date()
+                location_id : stand.location_id
+                beehouse_id : stand.beehouse_id
+                type : 'measure'
+                name : sensor.name
+                raw_value : value
+                value : value
+                unit : sensor.unit
+
+            db.save(measure).then ->
+
+                console.log "measure uploaded to db " + config.name
+
+        .catch (err)->
+
+            console.log err 
+        
+.catch (err)->
+
+    console.log err 

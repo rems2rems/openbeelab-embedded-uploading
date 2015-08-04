@@ -1,22 +1,52 @@
+Promise = require 'promise'
+PidController = require('node-pid-controller')
 
-searchEquilibrium = (motor,photoDiodeTop,photoDiodeBottom) ->
+_searchEquilibrium = (motor,photoDiode,pid,nbSteps,fulfill,reject)->
 
-    totalSteps = 0
+    photoDiode.getValue()
+    .then (light)->
+        command  = pid.update(light).toInt()
+        motor.move(command)
+        .then ->
+            nbSteps += command
+            goalIsReached = (command < 5)
+            if not goalIsReached
+                setTimeout( ( -> _searchEquilibrium(motor,photoDiode,pid,nbSteps,fulfill,reject)),50)
+            else
+                fulfill(nbSteps)
+        .catch reject
+    .catch reject
 
-    ligth = photoDiodeTop.analogRead()
-    while ligth < 400 or ligth > 600
+module.exports = searchEquilibrium = (sensor,device)->
+#(motor,photoDiode) ->
+    
 
-        command = 100 #steps
-        if ligth < 400
-            motor.forward(command)
-            totalSteps += command
-        else
-            motor.backward(command)
-            totalSteps -= command
+    Pin = require './pin'
+    
+    directionName = device.getGpioExportedName(sensor.motor.directionPinId)
+    directionPin = Pin.buildGpio(device,directionName)
+    directionPin.setOutputMode()
 
-        ligth = photoDiodeTop.analogRead()
+    pulseName = device.getGpioExportedName(sensor.motor.pulsePinId)
+    pulsePin = Pin.buildGpio(device,pulseName)
+    pulsePin.setOutputMode()
+
+    StepMotor = require('./stepMotor')
+
+    motor = StepMotor(directionPin,pulsePin)
+
+    photoDiode = Pin.buildAdc(device,sensor.photoDiode.pinId)
+
+    equilibrium = new Promise((fulfill,reject)->
         
+        pid = new PidController() #0.25, 0.01, 0.01, 1); # k_p, k_i, k_d, dt 
+        pid.setTarget(512)
+        nbSteps = 0
+        
+        _searchEquilibrium(motor,photoDiode,pid,nbSteps,fulfill,reject)
 
+    )
+    return equilibrium
 
 # rechercheEquilibre = () ->
 

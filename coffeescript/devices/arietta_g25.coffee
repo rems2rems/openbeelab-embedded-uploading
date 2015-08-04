@@ -4,40 +4,6 @@ Promise = require 'promise'
 fs = 
     readFile : Promise.denodeify nodeFs.readFile.bind(nodeFs)
     writeFile : Promise.denodeify nodeFs.writeFile.bind(nodeFs)
-    
-# arietta = require 'aria_fox_gpio'
-
-# Output = arietta({model: 'aria',debug: true}).OutGpio
-# Input = arietta({model: 'aria',debug: true}).InGpio
-
-# led = new Output 'J4', 10, ()->
-    
-#     #use callback to handle the init
-#     console.log('init callback button #1')
-
-#     isOn = false
-#     setInterval ()->
-#         isOn = !isOn
-#         if (isOn)
-#             led.setHigh()
-#         else
-#             led.setLow()
-#     , 500
-
-# #attach the init event fired (after the callback) when the led is ready 
-# led.attach 'init', (event)->
-#     console.log('init event button #1')
-
-# #attach the rising event fired when the led is turned on
-# led.attach 'rising', (event)->
-#     console.log('led is turned on')
-
-# #attach the rising event fired when the led is turned off
-# led.attach 'falling', (event)->
-#     console.log('led is turned off')
-
-
-# button = new Input 'J4', 10
 
 api =
 
@@ -45,35 +11,33 @@ api =
 
         fs.writeFile("/sys/class/gpio/export",kernelId)
 
-    teardown : (gpios)->
+    unexport : (kernelId)->
 
-        for pin in gpios
-
-            fs.writeFile("/sys/class/gpio/unexport",pin.kernelId)
+        fs.writeFile("/sys/class/gpio/unexport",kernelId)
     
-    setDirection : (pinName,direction)->
+    getDirection : (kernelId) ->
 
-        fs.writeFile "sys/class/gpio/" + pin.name + "/direction",direction
+        return fs.readFile("/sys/class/gpio/" + @getGpioExportedName(kernelId) + "/direction")
 
-    setInputMode : (pinName)->
+    setDirection : (kernelId,direction)->
 
-        @setDirection pinName,"in"
+        fs.writeFile "sys/class/gpio/" + @getGpioExportedName(kernelId) + "/direction",direction
 
-    setOutputMode : (pinName)->
+    setInputMode : (kernelId)->
 
-        @setDirection pinName,"out"    
+        @setDirection @getGpioExportedName(kernelId),"in"
 
-    use : (sensor) ->
+    setOutputMode : (kernelId)->
 
-        return @[sensor.measureType](sensor.pinName)
+        @setDirection @getGpioExportedName(kernelId),"out"    
 
-    digitalRead : (pinName) ->
+    digitalRead : (kernelId) ->
 
-        return fs.readFile("/sys/class/gpio/" + pinName + "/value")
+        return fs.readFile("/sys/class/gpio/" + @getGpioExportedName(kernelId) + "/value")
 
-    digitalWrite : (pinName,value) ->
+    digitalWrite : (kernelId,value) ->
 
-        return fs.writeFile("/sys/class/gpio/" + pinName + "/value",value)
+        return fs.writeFile("/sys/class/gpio/" + @getGpioExportedName(kernelId) + "/value",value)
 
     analogRead : (adcName) ->
 
@@ -86,5 +50,20 @@ api =
     sleep : () ->
 
         sh.exec("halt")
+
+    getGpioExportedName : (kernelId)->
+        
+        if kernelId < 32 or kernelId > 127
+            throw new Error('kernelId ' + kernelId + ' not allowed')
+
+        pinName = "pio"
+        if (kernelId >= 32 && kernelId <= 63)
+            pinName = pinName + 'A' + (kernelId - 32)
+        if (kernelId >= 64 && kernelId <= 95)
+            pinName = pinName + 'B' + (kernelId - 64)
+        if (kernelId >= 96 && kernelId <= 127)
+            pinName = pinName + 'C' + (kernelId - 96)
+        
+        return pinName
 
 module.exports = api

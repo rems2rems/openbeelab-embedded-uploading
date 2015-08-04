@@ -1,9 +1,12 @@
 Pin = require './pin'
-arietta = require './devices/arietta_g25'
+#device = require './devices/arietta_g25'
+device = require './devices/mock_device'
 
-directionPin = Pin.buildGpio(arietta,"pioB14")
+b14 = device.getGpioExportedName(46)
+console.log "should be pioB14:" + b14
+directionPin = Pin.buildGpio(device,46)
 directionPin.setOutput()
-pulsePin = Pin.buildGpio(arietta,"pioB13")
+pulsePin = Pin.buildGpio(device,"pioB13")
 pulsePin.setOutput()
 
 StepMotor = require('./stepMotor')
@@ -15,10 +18,10 @@ motor.backward(100)
 
 searchEquilibrium = require 'romanScale'
 
-photoDiodeTop    = Pin.buildAdc(arietta,"in_voltage0_raw")
-photoDiodeBottom = Pin.buildAdc(arietta,"in_voltage1_raw")
+photoDiode    = Pin.buildAdc(device,"in_voltage0_raw")
 
-promise = searchEquilibrium(motor,photoDiodeTop,photoDiodeBottom)
+searchEquilibrium = require './romanScale'
+promise = searchEquilibrium(motor,photoDiode)
 
 promise.then (nbSteps)->
 

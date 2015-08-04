@@ -1,4 +1,4 @@
-
+#test
 
 sensor =
     device : "arietta_g25"

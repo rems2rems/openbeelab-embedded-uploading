@@ -1,31 +1,27 @@
 
 module.exports =
 
-    buildGpio : (sensor) ->
+    buildGpio : (device,pinId) ->
 
-        device = sensor.device
-        kernelId = sensor.kernelId
-        pinName = sensor.pinName
-
-        device.setup [sensor]
+        device.export pinId
 
         return {
 
-            setInputMode : -> device.setInputMode(pinName)
-            setOutputMode : -> device.setOutputMode(pinName)
-            isOn : -> device.digitalRead(pinName).then (value)-> return value is "1"
+            setInputMode : -> device.setInputMode(pinId)
+            setOutputMode : -> device.setOutputMode(pinId)
+            isOn : -> device.digitalRead(pinId).then (value)-> return value is "1"
             isOff : -> @isOn().then (value) -> return not value
-            getValue : -> device.digitalRead(pinName)
+            getValue : -> device.digitalRead(pinId)
             setValue : (value)->
                 if value == true
                     value = "1"
                 if value == false
                     value = "0"
                 
-                device.digitalWrite(pinName,value)
+                device.digitalWrite(pinId,value)
             setOn : -> @setValue("1")
             setOff : -> @setValue("0")
-            unexport : -> device.unexport([sensor.kernelId])
+            unexport : -> device.unexport pinId
         }
 
     buildAdc : (device,pinName) ->
