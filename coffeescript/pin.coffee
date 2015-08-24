@@ -1,31 +1,24 @@
 
 module.exports =
 
-    buildGpio : (device,pinId,pinName) ->
+    buildGpio : (device,pinName,direction = "in") ->
 
-        device.export pinId
+        device.export pinName
+        device.setDirection(pinName,direction)
 
         return {
 
             setInputMode : =>
-                device.setInputMode(pinName) #.then =>
-                return @
+                device.setInputMode(pinName)
             setOutputMode : =>
-                device.setOutputMode(pinName) #.then =>
-                return @
-            isOn : -> device.digitalRead(pinName) is "1" #.then (value)-> return value
-            isOff : -> @isOn().then (value) -> return not value
+                device.setOutputMode(pinName)
+            isOn : -> @getValue() is on
+            isOff : -> @getValue() is off
             getValue : -> device.digitalRead(pinName)
-            setValue : (value)->
-                if value == true
-                    value = "1"
-                if value == false
-                    value = "0"
-                
-                device.digitalWrite(pinName,value)
+            setValue : (value)-> device.digitalWrite(pinName,value)
             setOn : -> @setValue(on)
             setOff : -> @setValue(off)
-            unexport : -> device.unexport pinId
+            unexport : -> device.unexport pinName
         }
 
     buildAdc : (device,pinName) ->

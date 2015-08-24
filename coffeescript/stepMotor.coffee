@@ -1,45 +1,46 @@
 require('../../openbeelab-util/javascript/arrayUtils').install()
 require('../../openbeelab-util/javascript/numberUtils').install()
-Promise = require 'promise'
+sleep = require('../../openbeelab-util/javascript/timeUtils').sleep
+Pin = require './pin'
 
-sleep = (time, callback)->
+module.exports = (device,pins) ->
 
-    stop = new Date().getTime()
-    while (new Date().getTime() < stop + time)
-        ;
-    
-    callback?()
+    enable = Pin.buildGpio(device,pins.enable,'out') #high pour moteur actif
+    ms1 = Pin.buildGpio(device,pins.ms1,'out') #microstep 1/2 pas
+    ms2 = Pin.buildGpio(device,pins.ms2,'out') #microstep 1/4 pas
+    ms3 = Pin.buildGpio(device,pins.ms3,'out') #microstep 1/16 pas si ms1 et ms2
+    pulse = Pin.buildGpio(device,pins.pulse,'out') #impulsions
+    direction = Pin.buildGpio(device,direction,'out') #avant/arriere
+    sleepPin = Pin.buildGpio(device,pins.sleep,'out') #logique inversée
+    reset = Pin.buildGpio(device,pins.reset,'out') #logique inversée
 
-module.exports = (directionPin,pulsePin) ->
+    enable.setOff()
+    ms1.setOff()
+    ms2.setOff()
+    ms3.setOff()
+    pulse.setOff()
+    direction.setOff()
+    reset.setOn()
+    sleepPin.setOn()
 
     return {
-        directionPin : directionPin
-        pulsePin : pulsePin
-        forward  : (nbSteps) -> @move(nbSteps,true)
-        backward : (nbSteps) -> @move(nbSteps,false)
-        move : (nbSteps,goForward) ->
 
-            if goForward is null
-                goForward = nbSteps > 0
+        forward  : (nbSteps) -> @move(nbSteps)
+        backward : (nbSteps) -> @move(-1*nbSteps)
+        move : (nbSteps) ->
+
+            console.log "moving..."
+
+            goForward = nbSteps > 0
             
             nbSteps = nbSteps.abs()
-
-            if goForward
-                direction = "1"
-            else
-                direction = "0"
             
-            @directionPin.setValue(direction) #.then =>
+            direction.setValue(goForward)
 
-                # promise = Promise.resolve()
-            nbSteps.times =>
-
-                # promise = promise.then => 
-                    
-                @pulsePin.setOn() #.then => 
-                sleep(100)
-                @pulsePin.setOff()
-                sleep(100)
-
-            return promise
+            nbSteps.times ->
+ 
+                pulse.setOn()
+                sleep(2) # ms
+                pulse.setOff()
+                sleep(2)
     }
