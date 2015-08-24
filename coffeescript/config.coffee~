@@ -1,0 +1,11 @@
+module.exports =
+    #host : 'dev.openbeelab.org'
+    host : 'localhost'
+    protocol : 'http'
+    port : 5984
+    # auth:
+    #     username: 'open4_uploader'
+    #     password: '07A0a7'
+    db : 'la_mine_dev'
+    apiary_name : 'la_mine_rucher_01'
+    #external_sites : ['openweathermap']

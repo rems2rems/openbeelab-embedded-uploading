@@ -7,11 +7,11 @@ db = dbDriver.database(config)
 insert_measure = require './insert_measure'
 
 
-standUrl = '_design/stands/_view/by_name?key="'+config.stand_name+'"'
-db.get standUrl
+#standUrl = '_design/stands/_view/by_name?key="'+config.stand_name+'"'
+db.get config.stand_id #standUrl
 .then (stand) ->
     
-    stand = stand[0].value
+    # stand = stand[0].value
     
     device = require './devices/' + stand.device
     

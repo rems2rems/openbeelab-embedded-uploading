@@ -2,6 +2,14 @@ require('../../openbeelab-util/javascript/arrayUtils').install()
 require('../../openbeelab-util/javascript/numberUtils').install()
 Promise = require 'promise'
 
+sleep = (time, callback)->
+
+    stop = new Date().getTime()
+    while (new Date().getTime() < stop + time)
+        ;
+    
+    callback?()
+
 module.exports = (directionPin,pulsePin) ->
 
     return {
@@ -13,21 +21,25 @@ module.exports = (directionPin,pulsePin) ->
 
             if goForward is null
                 goForward = nbSteps > 0
+            
+            nbSteps = nbSteps.abs()
 
             if goForward
                 direction = "1"
             else
                 direction = "0"
             
-            @directionPin.setValue(direction).then =>
+            @directionPin.setValue(direction) #.then =>
 
-                promise = Promise.resolve()
-                nbSteps.times =>
+                # promise = Promise.resolve()
+            nbSteps.times =>
 
-                    promise = promise.then => 
-                        
-                        @pulsePin.setOn().then => 
-                            @pulsePin.setOff()
+                # promise = promise.then => 
+                    
+                @pulsePin.setOn() #.then => 
+                sleep(100)
+                @pulsePin.setOff()
+                sleep(100)
 
-                return promise
+            return promise
     }

@@ -5,6 +5,6 @@ module.exports =
     port : 5984
     auth:
         username: 'admin'
-        password: 'xxx'
+        password: 'c0uchAdm1n'
     name : 'la_mine_dev'
-    stand_name : 'stand:v1_0001'
+    stand_id : 'stand:protopierre_001'
