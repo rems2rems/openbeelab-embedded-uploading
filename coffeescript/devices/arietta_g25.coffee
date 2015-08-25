@@ -1,6 +1,8 @@
 #sh = require('execSync')
 fs = require 'fs'
 
+require('../../../openbeelab-util/javascript/stringUtils').install()
+
 #nodeFs = require 'fs'
 #Promise = require 'promise'
 #fs = 
@@ -121,7 +123,8 @@ api =
 
     analogRead : (adcName) ->
 
-        return fs.readFileSync("/sys/bus/iio/devices/iio:device0/" + adcName).toInt()
+        value = "" + fs.readFileSync("/sys/bus/iio/devices/iio:device0/" + adcName)
+        return value.toInt()
 
     planWakeup : (seconds) ->
 
