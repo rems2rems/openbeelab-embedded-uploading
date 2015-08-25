@@ -12,7 +12,7 @@ pins =
     sleep : 'J4.26'
     reset : 'J4.24'
 
-motor = StepMotor(pins,device)
+motor = StepMotor(device,pins)
 
 loop
     motor.backward(100)
