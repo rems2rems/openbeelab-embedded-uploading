@@ -10,7 +10,7 @@ module.exports = (device,pins) ->
     ms2 = Pin.buildGpio(device,pins.ms2,'out') #microstep 1/4 pas
     ms3 = Pin.buildGpio(device,pins.ms3,'out') #microstep 1/16 pas si ms1 et ms2
     pulse = Pin.buildGpio(device,pins.pulse,'out') #impulsions
-    direction = Pin.buildGpio(device,direction,'out') #avant/arriere
+    direction = Pin.buildGpio(device,pins.direction,'out') #avant/arriere
     sleepPin = Pin.buildGpio(device,pins.sleep,'out') #logique inversée
     reset = Pin.buildGpio(device,pins.reset,'out') #logique inversée
 
