@@ -146,4 +146,5 @@ api =
         
     #     return pinName
 
+api.unexportAll()
 module.exports = api
