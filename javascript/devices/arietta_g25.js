@@ -105,7 +105,8 @@
       return fs.writeFileSync("/sys/class/gpio/" + pin2name[pinName] + "/value", value);
     },
     analogRead: function(adcName) {
-      return fs.readFileSync("/sys/bus/iio/devices/iio:device0/" + adcName).toInt();
+      value = "" + fs.readFileSync("/sys/bus/iio/devices/iio:device0/" + adcName)
+      return value.toInt();
     },
     planWakeup: function(seconds) {
       return fs.writeFileSync("/sys/class/rtc/rtc0/wakealarm", "" + seconds);
