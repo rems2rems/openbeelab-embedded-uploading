@@ -87,7 +87,7 @@ api =
 
     setDirection : (pinName,direction)->
 
-        fs.writeFileSync "sys/class/gpio/" + pin2name[pinName] + "/direction",direction
+        fs.writeFileSync "/sys/class/gpio/" + pin2name[pinName] + "/direction",direction
 
     setInputMode : (pinName)->
 
