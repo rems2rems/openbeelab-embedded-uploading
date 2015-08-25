@@ -7,9 +7,6 @@ fs = require 'fs'
 #    readFile : Promise.denodeify nodeFs.readFile.bind(nodeFs)
 #    writeFile : Promise.denodeify nodeFs.writeFile.bind(nodeFs)
 
-
-device.unexportAll()
-
 pin2name =
 
     'J4.7'  : 'pioA23'
@@ -94,7 +91,6 @@ api =
                 @unexport pin
             catch e
                 console.log e
-                # ...
 
     getDirection : (pinName) ->
 
