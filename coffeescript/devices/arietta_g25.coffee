@@ -75,9 +75,6 @@ api =
 
     export : (pinName)->
 
-        console.log pinName
-        console.log pin2kid[pinName]
-
         return fs.writeFileSync("/sys/class/gpio/export","" + pin2kid[pinName])
 
     unexport : (pinName)->
@@ -89,8 +86,9 @@ api =
         for pin,_ of pin2kid
             try
                 @unexport pin
+                console.log "unexported pin " + pin
             catch e
-                console.log e
+                ;
 
     getDirection : (pinName) ->
 
