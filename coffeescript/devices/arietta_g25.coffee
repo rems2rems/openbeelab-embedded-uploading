@@ -7,6 +7,9 @@ fs = require 'fs'
 #    readFile : Promise.denodeify nodeFs.readFile.bind(nodeFs)
 #    writeFile : Promise.denodeify nodeFs.writeFile.bind(nodeFs)
 
+
+device.unexportAll()
+
 pin2name =
 
     'J4.7'  : 'pioA23'
@@ -75,12 +78,24 @@ api =
 
     export : (pinName)->
 
+        console.log pinName
+        console.log pin2kid[pinName]
+
         return fs.writeFileSync("/sys/class/gpio/export","" + pin2kid[pinName])
 
     unexport : (pinName)->
 
         return fs.writeFileSync("/sys/class/gpio/unexport",pin2kid[pinName])
-    
+
+    unexportAll : ()->
+
+        for pin,_ of pin2kid
+            try
+                @unexport pin
+            catch e
+                console.log e
+                # ...
+
     getDirection : (pinName) ->
 
         return fs.readFileSync("/sys/class/gpio/" + pin2name[pinName] + "/direction")
