@@ -15,13 +15,19 @@
   sleep = require('../../openbeelab-util/javascript/timeUtils').sleep;
 
   _searchEquilibrium = function(motor, photoDiode1, photoDiode2, pid) {
-    var command, deltaLight, goalIsReached;
+    var command, deltaLight, goalIsReached, light1, light2;
     console.log("searching equilibrium...");
-    deltaLight = photoDiode1.getValue() - photoDiode2.getValue();
+    light1 = photoDiode1.getValue();
+    light2 = photoDiode2.getValue();
+    console.log("light1=" + light1);
+    console.log("light2=" + light2);
+    deltaLight = light1 - light2;
     command = pid.update(deltaLight).floor();
+    console.log("command=" + command);
     motor.move(command);
     goalIsReached = command < 5;
     if (goalIsReached) {
+      console.log("equilibrium found.");
       return command;
     }
     return command + _searchEquilibrium(motor, photoDiode1, photoDiode2, pid);
@@ -32,7 +38,7 @@
     motor = StepMotor(device, sensor.motor);
     photoDiode1 = Pin.buildAdc(device, sensor.photoDiode1);
     photoDiode2 = Pin.buildAdc(device, sensor.photoDiode2);
-    pid = new PidController(0.25, 0.01, 0.01, 1);
+    pid = new PidController(1, 0.01, 0.01, 1);
     pid.setTarget(sensor.deltaTarget);
     nbSteps = 0;
     return {

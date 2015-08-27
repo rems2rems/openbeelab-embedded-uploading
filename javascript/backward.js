@@ -17,7 +17,7 @@
     reset: 'J4.24'
   };
 
-  motor = StepMotor(pins, device);
+  motor = StepMotor(device, pins);
 
   while (true) {
     motor.backward(100);

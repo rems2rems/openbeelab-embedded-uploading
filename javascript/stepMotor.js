@@ -17,7 +17,7 @@
     ms2 = Pin.buildGpio(device, pins.ms2, 'out');
     ms3 = Pin.buildGpio(device, pins.ms3, 'out');
     pulse = Pin.buildGpio(device, pins.pulse, 'out');
-    direction = Pin.buildGpio(device, direction, 'out');
+    direction = Pin.buildGpio(device, pins.direction, 'out');
     sleepPin = Pin.buildGpio(device, pins.sleep, 'out');
     reset = Pin.buildGpio(device, pins.reset, 'out');
     enable.setOff();

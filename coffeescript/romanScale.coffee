@@ -10,15 +10,22 @@ _searchEquilibrium = (motor,photoDiode1,photoDiode2,pid)->
 
     console.log "searching equilibrium..."
 
-    deltaLight = photoDiode1.getValue() - photoDiode2.getValue()
+    light1 = photoDiode1.getValue()
+    light2 = photoDiode2.getValue()
+    console.log "light1=" + light1
+    console.log "light2=" + light2
+    deltaLight = light1 - light2
     
     command  = pid.update(deltaLight).floor()
     
+    console.log "command=" + command
+
     motor.move(command)
     
     goalIsReached = (command < 5)
     
     if goalIsReached
+        console.log "equilibrium found."
         return command
 
     #sleep(200)
@@ -33,7 +40,7 @@ module.exports = (sensor,device)->
     photoDiode1 = Pin.buildAdc(device,sensor.photoDiode1)
     photoDiode2 = Pin.buildAdc(device,sensor.photoDiode2)
  
-    pid = new PidController(0.25, 0.01, 0.01, 1); # k_p, k_i, k_d, dt 
+    pid = new PidController(1, 0.01, 0.01, 1); # k_p, k_i, k_d, dt 
     pid.setTarget(sensor.deltaTarget)
     nbSteps = 0
     

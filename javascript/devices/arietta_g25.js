@@ -4,36 +4,38 @@
 
   fs = require('fs');
 
+  require('../../../openbeelab-util/javascript/stringUtils').install();
+
   pin2name = {
-    'J4.7': 'PA23',
-    'J4.8': 'PA22',
-    'J4.10': 'PA21',
-    'J4.11': 'PA24',
-    'J4.12': 'PA31',
-    'J4.13': 'PA25',
-    'J4.14': 'PA30',
-    'J4.15': 'PA26',
-    'J4.17': 'PA27',
-    'J4.19': 'PA28',
-    'J4.21': 'PA29',
-    'J4.23': 'PA0',
-    'J4.24': 'PA1',
-    'J4.25': 'PA8',
-    'J4.26': 'PA7',
-    'J4.27': 'PA6',
-    'J4.28': 'PA5',
-    'J4.29': 'PC28',
-    'J4.30': 'PC27',
-    'J4.31': 'PC4',
-    'J4.32': 'PC31',
-    'J4.33': 'PC3',
-    'J4.34': 'PB11',
-    'J4.35': 'PC2',
-    'J4.36': 'PB12',
-    'J4.37': 'PC1',
-    'J4.38': 'PB13',
-    'J4.39': 'PC0',
-    'J4.40': 'PB14'
+    'J4.7': 'pioA23',
+    'J4.8': 'pioA22',
+    'J4.10': 'pioA21',
+    'J4.11': 'pioA24',
+    'J4.12': 'pioA31',
+    'J4.13': 'pioA25',
+    'J4.14': 'pioA30',
+    'J4.15': 'pioA26',
+    'J4.17': 'pioA27',
+    'J4.19': 'pioA28',
+    'J4.21': 'pioA29',
+    'J4.23': 'pioA0',
+    'J4.24': 'pioA1',
+    'J4.25': 'pioA8',
+    'J4.26': 'pioA7',
+    'J4.27': 'pioA6',
+    'J4.28': 'pioA5',
+    'J4.29': 'pioC28',
+    'J4.30': 'pioC27',
+    'J4.31': 'pioC4',
+    'J4.32': 'pioC31',
+    'J4.33': 'pioC3',
+    'J4.34': 'pioB11',
+    'J4.35': 'pioC2',
+    'J4.36': 'pioB12',
+    'J4.37': 'pioC1',
+    'J4.38': 'pioB13',
+    'J4.39': 'pioC0',
+    'J4.40': 'pioB14'
   };
 
   pin2kid = {
@@ -75,11 +77,25 @@
     unexport: function(pinName) {
       return fs.writeFileSync("/sys/class/gpio/unexport", pin2kid[pinName]);
     },
+    unexportAll: function() {
+      var _, e, pin, results;
+      results = [];
+      for (pin in pin2kid) {
+        _ = pin2kid[pin];
+        try {
+          this.unexport(pin);
+          results.push(console.log("unexported pin " + pin));
+        } catch (_error) {
+          e = _error;
+        }
+      }
+      return results;
+    },
     getDirection: function(pinName) {
       return fs.readFileSync("/sys/class/gpio/" + pin2name[pinName] + "/direction");
     },
     setDirection: function(pinName, direction) {
-      return fs.writeFileSync("sys/class/gpio/" + pin2name[pinName] + "/direction", direction);
+      return fs.writeFileSync("/sys/class/gpio/" + pin2name[pinName] + "/direction", direction);
     },
     setInputMode: function(pinName) {
       return this.setDirection(pinName, "in");
@@ -105,7 +121,8 @@
       return fs.writeFileSync("/sys/class/gpio/" + pin2name[pinName] + "/value", value);
     },
     analogRead: function(adcName) {
-      value = "" + fs.readFileSync("/sys/bus/iio/devices/iio:device0/" + adcName)
+      var value;
+      value = "" + fs.readFileSync("/sys/bus/iio/devices/iio:device0/" + adcName);
       return value.toInt();
     },
     planWakeup: function(seconds) {
@@ -115,6 +132,8 @@
       return sh.exec("halt");
     }
   };
+
+  api.unexportAll();
 
   module.exports = api;
 
