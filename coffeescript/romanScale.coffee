@@ -23,6 +23,8 @@ _searchEquilibrium = (motor,photoDiode1,photoDiode2,pid)->
         until light1 - light2 < 10
             motor.forward()
             nbSteps += 1
+            light1 = photoDiode1.getValue()
+            light2 = photoDiode2.getValue()
 
     # si light 2> light 1  --> tourne -
     # jusqu-à light1 - light2 > 100
@@ -31,9 +33,14 @@ _searchEquilibrium = (motor,photoDiode1,photoDiode2,pid)->
         until light1 - light2 > 100
             motor.backward()
             nbSteps -= 1
+            light1 = photoDiode1.getValue()
+            light2 = photoDiode2.getValue()
+
         until light1 - light2 < 10
             motor.forward()
             nbSteps += 1
+            light1 = photoDiode1.getValue()
+            light2 = photoDiode2.getValue()
  
     # si light2- light 1 < 10 --> pas de nouvelle mesure
     if light2 - light1 < 10
