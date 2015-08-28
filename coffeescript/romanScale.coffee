@@ -1,5 +1,5 @@
-Promise = require 'promise'
-PidController = require('node-pid-controller')
+
+#PidController = require('node-pid-controller')
 require('../../openbeelab-util/javascript/numberUtils').install()
 Pin = require './pin'
 StepMotor = require('./stepMotor')
@@ -16,20 +16,48 @@ _searchEquilibrium = (motor,photoDiode1,photoDiode2,pid)->
     console.log "light2=" + light2
     deltaLight = light1 - light2
     
-    command  = pid.update(deltaLight).floor()
-    
-    console.log "command=" + command
+    nbSteps = 0
+    # si light 1 > light 2   --> tourne +
+    # jusqu-à light1 - light 2 < 10
+    if light1 > light2
+        until light1 - light2 < 10
+            motor.forward()
+            nbSteps += 1
 
-    motor.move(command)
+    # si light 2> light 1  --> tourne -
+    # jusqu-à light1 - light2 > 100
+    # tourne + jusqu-à light1 - light 2 < 10
+    if light2 > light1
+        until light1 - light2 > 100
+            motor.backward()
+            nbSteps -= 1
+        until light1 - light2 < 10
+            motor.forward()
+            nbSteps += 1
+ 
+    # si light2- light 1 < 10 --> pas de nouvelle mesure
+    if light2 - light1 < 10
+        ; # what??
     
-    goalIsReached = (command < 5)
-    
-    if goalIsReached
-        console.log "equilibrium found."
-        return command
+    return nbSteps
 
-    #sleep(200)
-    return command + _searchEquilibrium(motor,photoDiode1,photoDiode2,pid)
+    # command  = pid.update(deltaLight).floor()
+    
+    # console.log "command=" + command
+
+    # motor.move(command)
+    
+    # goalIsReached = (command.abs() < 5)
+    
+    # if goalIsReached
+    #     console.log "equilibrium found."
+    #     return {nbSteps : command, nbMoves : 1}
+
+    # #sleep(200)
+    # infos = _searchEquilibrium(motor,photoDiode1,photoDiode2,pid)
+    # infos.nbSteps += command
+    # infos.nbMoves += 1
+    # return infos
         
 
 
@@ -40,15 +68,18 @@ module.exports = (sensor,device)->
     photoDiode1 = Pin.buildAdc(device,sensor.photoDiode1)
     photoDiode2 = Pin.buildAdc(device,sensor.photoDiode2)
  
-    pid = new PidController(1, 0.01, 0.01, 1); # k_p, k_i, k_d, dt 
-    pid.setTarget(sensor.deltaTarget)
-    nbSteps = 0
+    # pid = new PidController(1, 0.01, 0.01, 1); # k_p, k_i, k_d, dt 
+    # pid.setTarget(sensor.deltaTarget)
     
     return {
 
         searchEquilibrium : ->
-       
-            return _searchEquilibrium(motor,photoDiode1,photoDiode2,pid)
+            
+            motor.switchOn()
+            infos = _searchEquilibrium(motor,photoDiode1,photoDiode2) #,pid)
+            motor.switchOff()
+
+            return infos
     }
 
 # rechercheEquilibre = () ->

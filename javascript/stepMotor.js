@@ -20,28 +20,43 @@
     direction = Pin.buildGpio(device, pins.direction, 'out');
     sleepPin = Pin.buildGpio(device, pins.sleep, 'out');
     reset = Pin.buildGpio(device, pins.reset, 'out');
-    enable.setOff();
     ms1.setOff();
     ms2.setOff();
     ms3.setOff();
-    pulse.setOff();
-    direction.setOff();
-    reset.setOn();
-    sleepPin.setOn();
     return {
+      switchOn: function() {
+        enable.setOff();
+        reset.setOn();
+        sleepPin.setOn();
+        return sleep(1);
+      },
+      switchOff: function() {
+        enable.setOn();
+        reset.setOff();
+        return sleepPin.setOff();
+      },
       forward: function(nbSteps) {
+        if (nbSteps == null) {
+          nbSteps = 1;
+        }
         return this.move(nbSteps);
       },
       backward: function(nbSteps) {
+        if (nbSteps == null) {
+          nbSteps = 1;
+        }
         return this.move(-1 * nbSteps);
       },
       move: function(nbSteps) {
         var goForward;
+        if (nbSteps == null) {
+          nbSteps = 1;
+        }
         console.log("moving...");
         goForward = nbSteps > 0;
         nbSteps = nbSteps.abs();
         direction.setValue(goForward);
-        return nbSteps.times(function() {
+        nbSteps.times(function() {
           pulse.setOn();
           sleep(2);
           pulse.setOff();

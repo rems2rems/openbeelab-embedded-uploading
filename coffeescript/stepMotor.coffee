@@ -14,20 +14,29 @@ module.exports = (device,pins) ->
     sleepPin = Pin.buildGpio(device,pins.sleep,'out') #logique inversée
     reset = Pin.buildGpio(device,pins.reset,'out') #logique inversée
 
-    enable.setOff()
     ms1.setOff()
     ms2.setOff()
     ms3.setOff()
-    pulse.setOff()
-    direction.setOff()
-    reset.setOn()
-    sleepPin.setOn()
 
     return {
 
-        forward  : (nbSteps) -> @move(nbSteps)
-        backward : (nbSteps) -> @move(-1*nbSteps)
-        move : (nbSteps) ->
+        switchOn : ->
+
+            enable.setOff()
+            reset.setOn()
+            sleepPin.setOn()
+
+            sleep(1)
+
+        switchOff : ->
+
+            enable.setOn()
+            reset.setOff()
+            sleepPin.setOff()
+
+        forward  : (nbSteps=1) -> @move(nbSteps)
+        backward : (nbSteps=1) -> @move(-1*nbSteps)
+        move : (nbSteps=1) ->
 
             console.log "moving..."
 
@@ -43,4 +52,6 @@ module.exports = (device,pins) ->
                 sleep(2) # ms
                 pulse.setOff()
                 sleep(2)
+
+            return
     }
