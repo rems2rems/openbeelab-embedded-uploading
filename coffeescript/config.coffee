@@ -4,7 +4,7 @@ module.exports =
     protocol : 'http'
     port : 5984
     auth:
-        username: 'admin'
-        password: 'c0uchAdm1n'
-    name : 'la_mine_dev'
-    stand_id : 'stand:protopierre_001'
+        username: 'fred_db_uploader'
+        password: 'xxx'
+    name : 'fred_db'
+    stand_id : 'stand:socle_001'
