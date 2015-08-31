@@ -38,16 +38,22 @@
   };
 
   module.exports = function(sensor, device) {
-    var motor, photoDiode1, photoDiode2;
+    var ir_diode1, ir_diode2, motor, photoDiode1, photoDiode2;
     motor = StepMotor(device, sensor.motor);
     photoDiode1 = Pin.buildAdc(device, sensor.photoDiode1);
     photoDiode2 = Pin.buildAdc(device, sensor.photoDiode2);
+    ir_diode1 = Pin.buildGpio(device, pins.ir_diode1, 'out');
+    ir_diode2 = Pin.buildGpio(device, pins.ir_diode2, 'out');
     return {
       searchEquilibrium: function() {
         var infos;
         motor.switchOn();
+        ir_diode1.setOn();
+        ir_diode2.setOn();
         infos = _searchEquilibrium(motor, photoDiode1, photoDiode2);
         motor.switchOff();
+        ir_diode1.setOff();
+        ir_diode2.setOff();
         return infos;
       }
     };
