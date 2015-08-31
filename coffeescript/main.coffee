@@ -17,33 +17,32 @@ db.get config.stand_id #standUrl
     
     for sensor in stand.sensors
         
-        if not device[sensor.type]?
-            measure = require "./" + sensor.type
+        if device[sensor.process]?
+
+            measure = device[sensor.process]
+            
         else
-            measure = device[sensor.type]
+            
+            specificProcess = require './' + sensor.process
+            measure = specificProcess(sensor,device)[sensor.action]
 
-        measurePromise = measure(sensor,device)
-        measurePromise.then (value)->
+        value = measure(sensor,device)
 
-            console.log value
+        console.log value
 
-            measure =
-                timestamp : new Date()
-                location_id : stand.location_id
-                beehouse_id : stand.beehouse_id
-                type : 'measure'
-                name : sensor.name
-                raw_value : value
-                value : value
-                unit : sensor.unit
+        measure =
+            timestamp : new Date()
+            location_id : stand.location_id
+            beehouse_id : stand.beehouse_id
+            type : 'measure'
+            name : sensor.name
+            raw_value : value
+            value : value
+            unit : sensor.unit
 
-            db.save(measure).then ->
+        db.save(measure).then ->
 
-                console.log "measure uploaded to db " + config.name
-
-        .catch (err)->
-
-            console.log err 
+            console.log "measure uploaded to db " + config.name
         
 .catch (err)->
 

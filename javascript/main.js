@@ -11,35 +11,32 @@
   insert_measure = require('./insert_measure');
 
   db.get(config.stand_id).then(function(stand) {
-    var device, i, len, measure, measurePromise, ref, results, sensor;
+    var device, i, len, measure, ref, results, sensor, specificProcess, value;
     device = require('./devices/' + stand.device);
     ref = stand.sensors;
     results = [];
     for (i = 0, len = ref.length; i < len; i++) {
       sensor = ref[i];
-      if (device[sensor.type] == null) {
-        measure = require("./" + sensor.type);
+      if (device[sensor.process] != null) {
+        measure = device[sensor.process];
       } else {
-        measure = device[sensor.type];
+        specificProcess = require('./' + sensor.process);
+        measure = specificProcess(sensor, device)[sensor.action];
       }
-      measurePromise = measure(sensor, device);
-      results.push(measurePromise.then(function(value) {
-        console.log(value);
-        measure = {
-          timestamp: new Date(),
-          location_id: stand.location_id,
-          beehouse_id: stand.beehouse_id,
-          type: 'measure',
-          name: sensor.name,
-          raw_value: value,
-          value: value,
-          unit: sensor.unit
-        };
-        return db.save(measure).then(function() {
-          return console.log("measure uploaded to db " + config.name);
-        });
-      })["catch"](function(err) {
-        return console.log(err);
+      value = measure(sensor, device);
+      console.log(value);
+      measure = {
+        timestamp: new Date(),
+        location_id: stand.location_id,
+        beehouse_id: stand.beehouse_id,
+        type: 'measure',
+        name: sensor.name,
+        raw_value: value,
+        value: value,
+        unit: sensor.unit
+      };
+      results.push(db.save(measure).then(function() {
+        return console.log("measure uploaded to db " + config.name);
       }));
     }
     return results;
