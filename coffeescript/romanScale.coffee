@@ -17,14 +17,16 @@ _searchEquilibrium = (motor,photoDiode1,photoDiode2,pid)->
     nbSteps = 0
 
     if light2 > light1
-        until light1 - light2 > 100
+        until deltaLight > 100
             motor.backward()
             nbSteps -= 1
             light1 = photoDiode1.getValue()
             light2 = photoDiode2.getValue()
+            deltaLight = light1 - light2
 
     until deltaLight < 10
         motor.forward()
+        sleep(1025 - deltaLight.abs())
         nbSteps += 1
         light1 = photoDiode1.getValue()
         light2 = photoDiode2.getValue()

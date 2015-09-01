@@ -20,15 +20,17 @@
     deltaLight = light1 - light2;
     nbSteps = 0;
     if (light2 > light1) {
-      while (!(light1 - light2 > 100)) {
+      while (!(deltaLight > 100)) {
         motor.backward();
         nbSteps -= 1;
         light1 = photoDiode1.getValue();
         light2 = photoDiode2.getValue();
+        deltaLight = light1 - light2;
       }
     }
     while (!(deltaLight < 10)) {
       motor.forward();
+      sleep(1025 - deltaLight.abs());
       nbSteps += 1;
       light1 = photoDiode1.getValue();
       light2 = photoDiode2.getValue();
