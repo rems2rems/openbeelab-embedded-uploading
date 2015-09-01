@@ -18,6 +18,8 @@
     },
     photoDiode1: 'in_voltage0_raw',
     photoDiode2: 'in_voltage1_raw',
+    ir_diode1: 'J4.27',
+    ir_diode2: 'J4.29',
     deltaTarget: 0
   };
 
