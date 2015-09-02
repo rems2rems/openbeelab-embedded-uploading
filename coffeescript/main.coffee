@@ -6,7 +6,6 @@ db = dbDriver.database(config)
 
 insert_measure = require './insert_measure'
 
-
 #standUrl = '_design/stands/_view/by_name?key="'+config.stand_name+'"'
 db.get config.stand_id #standUrl
 .then (stand) ->
@@ -17,10 +16,14 @@ db.get config.stand_id #standUrl
     
     for sensor in stand.sensors
         
+        if not sensor.active
+            continue
+        
+        sensor.device = device
         if device[sensor.process]?
 
             measure = device[sensor.process]
-            
+
         else
             
             specificProcess = require './' + sensor.process
@@ -37,12 +40,18 @@ db.get config.stand_id #standUrl
             type : 'measure'
             name : sensor.name
             raw_value : value
-            value : value
+            value : (value-sensor.bias)*sensor.gain
             unit : sensor.unit
 
         db.save(measure).then ->
 
             console.log "measure uploaded to db " + config.name
+
+    if stand.sleepMode is on and device.planWakeup and device.shutdown
+        device.planWakeup(10)
+        console.log "system will reboot 10 seconds after shutdown"
+        device.shutdown()
+        console.log "system is going to shutdown..."
         
 .catch (err)->
 
