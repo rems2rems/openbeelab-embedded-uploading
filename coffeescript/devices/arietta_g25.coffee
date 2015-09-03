@@ -119,7 +119,7 @@ api =
             value = "1"
         if value is off
             value = "0"
-        return fs.writeFileSync("/sys/class/gpio/" + pin2name[pinName] + "/value",value)
+        fs.writeFileSync("/sys/class/gpio/" + pin2name[pinName] + "/value",value)
 
     analogRead : (adcName) ->
 
@@ -128,26 +128,11 @@ api =
 
     planWakeup : (seconds) ->
 
-        return fs.writeFileSync("/sys/class/rtc/rtc0/wakealarm","" + seconds)
+        fs.writeFileSync("/sys/class/rtc/rtc0/wakealarm","" + seconds)
 
-    sleep : () ->
+    shutdown : () ->
 
         sh.exec("halt")
-
-    # getGpioExportedName : (kernelId)->
-        
-    #     if kernelId < 32 or kernelId > 127
-    #         throw new Error('kernelId ' + kernelId + ' not allowed')
-
-    #     pinName = "pio"
-    #     # if (kernelId >= 32 && kernelId <= 63)
-    #     #     pinName = pinName + 'A' + (kernelId - 32)
-    #     if (kernelId >= 64 && kernelId <= 95)
-    #         pinName = pinName + 'A' + (kernelId - 64)
-    #     if (kernelId >= 96 && kernelId <= 127)
-    #         pinName = pinName + 'B' + (kernelId - 96)
-        
-    #     return pinName
 
 api.unexportAll()
 module.exports = api
