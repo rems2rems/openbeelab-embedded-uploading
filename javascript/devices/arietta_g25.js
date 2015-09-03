@@ -128,7 +128,7 @@
     planWakeup: function(seconds) {
       return fs.writeFileSync("/sys/class/rtc/rtc0/wakealarm", "" + seconds);
     },
-    sleep: function() {
+    shutdown: function() {
       return sh.exec("halt");
     }
   };
