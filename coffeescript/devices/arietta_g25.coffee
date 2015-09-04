@@ -1,4 +1,4 @@
-#sh = require('execSync')
+sh = require('execSync')
 fs = require 'fs'
 
 require('../../../openbeelab-util/javascript/stringUtils').install()
@@ -127,12 +127,14 @@ api =
         return value.toInt()
 
     planWakeup : (seconds) ->
-
-        fs.writeFileSync("/sys/class/rtc/rtc0/wakealarm","" + seconds)
+        
+        sh.exec("wakeup_ena")
+        fs.writeFileSync("/sys/class/rtc/rtc0/wakealarm","")
+        fs.writeFileSync("/sys/class/rtc/rtc0/wakealarm","+" + seconds)
 
     shutdown : () ->
 
-        sh.exec("halt")
+        sh.exec("shutdown -h now")
 
 api.unexportAll()
 module.exports = api
