@@ -43,7 +43,7 @@
       });
     }
     if (stand.sleepMode === true && device.planWakeup && device.shutdown) {
-      device.planWakeup(10);
+      device.planWakeup(stand.sleepDuration);
       console.log("system will reboot 10 seconds after shutdown");
       device.shutdown();
       return console.log("system is going to shutdown...");

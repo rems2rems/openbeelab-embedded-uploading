@@ -6,6 +6,12 @@ db = dbDriver.database(config)
 
 insert_measure = require './insert_measure'
 
+# db.exists()
+# .then (db)->
+#     console.log db
+# .catch (err)->
+#     console.log err
+
 #standUrl = '_design/stands/_view/by_name?key="'+config.stand_name+'"'
 db.get config.stand_id #standUrl
 .then (stand) ->
@@ -48,7 +54,7 @@ db.get config.stand_id #standUrl
             console.log "measure uploaded to db " + config.name
 
     if stand.sleepMode is on and device.planWakeup and device.shutdown
-        device.planWakeup(10)
+        device.planWakeup(stand.sleepDuration)
         console.log "system will reboot 10 seconds after shutdown"
         device.shutdown()
         console.log "system is going to shutdown..."
