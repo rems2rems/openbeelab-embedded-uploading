@@ -49,9 +49,16 @@ db.get config.stand_id #standUrl
             value : (value-sensor.bias)*sensor.gain
             unit : sensor.unit
 
-        db.save(measure).then ->
+        db.save(measure).then (result)->
 
             console.log "measure uploaded to db " + config.name
+            try
+                add_server_timestamp = 
+                    _id : "_design/updates/_update/time/" + result._id
+                
+                db.save(add_server_timestamp)
+                .then ->
+                    console.log "added server timestamp to measure " + result._id
 
 .catch (err)->
 

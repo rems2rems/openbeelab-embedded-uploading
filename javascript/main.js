@@ -39,8 +39,17 @@
         value: (value - sensor.bias) * sensor.gain,
         unit: sensor.unit
       };
-      results.push(db.save(measure).then(function() {
-        return console.log("measure uploaded to db " + config.name);
+      results.push(db.save(measure).then(function(result) {
+        var add_server_timestamp;
+        console.log("measure uploaded to db " + config.name);
+        try {
+          add_server_timestamp = {
+            _id: "_design/updates/_update/time/" + result._id
+          };
+          return db.save(add_server_timestamp).then(function() {
+            return console.log("added server timestamp to measure " + result._id);
+          });
+        } catch (_error) {}
       }));
     }
     return results;
