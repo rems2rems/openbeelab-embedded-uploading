@@ -11,9 +11,10 @@
   insert_measure = require('./insert_measure');
 
   db.get(config.stand_id).then(function(stand) {
-    var device, i, len, measure, ref, sensor, specificProcess, value;
+    var device, i, len, measure, ref, results, sensor, specificProcess, value;
     device = require('./devices/' + stand.device);
     ref = stand.sensors;
+    results = [];
     for (i = 0, len = ref.length; i < len; i++) {
       sensor = ref[i];
       if (!sensor.active) {
@@ -38,16 +39,11 @@
         value: (value - sensor.bias) * sensor.gain,
         unit: sensor.unit
       };
-      db.save(measure).then(function() {
+      results.push(db.save(measure).then(function() {
         return console.log("measure uploaded to db " + config.name);
-      });
+      }));
     }
-    if (stand.sleepMode === true && device.planWakeup && device.shutdown) {
-      device.planWakeup(stand.sleepDuration);
-      console.log("system will reboot 10 seconds after shutdown");
-      device.shutdown();
-      return console.log("system is going to shutdown...");
-    }
+    return results;
   })["catch"](function(err) {
     return console.log(err);
   });

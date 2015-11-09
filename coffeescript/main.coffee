@@ -53,12 +53,6 @@ db.get config.stand_id #standUrl
 
             console.log "measure uploaded to db " + config.name
 
-    if stand.sleepMode is on and device.planWakeup and device.shutdown
-        device.planWakeup(stand.sleepDuration)
-        console.log "system will reboot 10 seconds after shutdown"
-        device.shutdown()
-        console.log "system is going to shutdown..."
-        
 .catch (err)->
 
     console.log err 
