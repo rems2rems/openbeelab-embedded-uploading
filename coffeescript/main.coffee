@@ -2,29 +2,37 @@
 dbDriver = require '../../openbeelab-db-util/javascript/dbUtil'
 config = require './config'
 
-db = dbDriver.database(config)
+configDbOptions = 
+    host : config.host
+    protocol : config.protocol
+    port : config.port
+    auth:
+        username: config.auth.username
+        password: config.auth.password
+    name : config.name + "_config"
+
+configDb = dbDriver.database(configDbOptions)
+
+dataDbOptions = 
+    host : config.host
+    protocol : config.protocol
+    port : config.port
+    auth:
+        username: config.auth.username
+        password: config.auth.password
+    name : config.name + "_data"
+
+dataDb = dbDriver.database(dataDbOptions)
 
 insert_measure = require './insert_measure'
 
-# db.exists()
-# .then (db)->
-#     console.log db
-# .catch (err)->
-#     console.log err
-
-#standUrl = '_design/stands/_view/by_name?key="'+config.stand_name+'"'
-db.get config.stand_id #standUrl
+configDb.get config.stand_id
 .then (stand) ->
-    
-    # stand = stand[0].value
     
     device = require './devices/' + stand.device
     
-    for sensor in stand.sensors
-        
-        if not sensor.active
-            continue
-        
+    for sensor in stand.sensors when sensor.active
+                
         sensor.device = device
         if device[sensor.process]?
 
@@ -37,28 +45,29 @@ db.get config.stand_id #standUrl
 
         value = measure(sensor,device)
 
-        console.log value
+        console.log("measure:" + value)
 
         measure =
             timestamp : new Date()
-            location_id : stand.location_id
-            beehouse_id : stand.beehouse_id
+            location : stand.location
+            beehouse : stand.beehouse
+            stand_id : stand._id
             type : 'measure'
             name : sensor.name
             raw_value : value
             value : (value-sensor.bias)*sensor.gain
             unit : sensor.unit
 
-        db.save(measure).then (result)->
+        dataDb.save(measure).then (result)->
 
-            console.log "measure uploaded to db " + config.name
-            try
-                add_server_timestamp = 
-                    _id : "_design/updates/_update/time/" + result._id
+            console.log "measure uploaded to db " + dataDbOptions.name
+            console.log "measure id:" + result._id
+            
+            dataDb.save({ _id : "_design/updates/_update/time/" + result._id })
+
+        .then () ->
                 
-                db.save(add_server_timestamp)
-                .then ->
-                    console.log "added server timestamp to measure " + result._id
+            console.log "added server timestamp"
 
 .catch (err)->
 
