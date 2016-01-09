@@ -4,9 +4,9 @@
 
   require('../../openbeelab-util/javascript/numberUtils').install();
 
-  Pin = require('./pin');
+  Pin = require('./drivers/pin');
 
-  StepMotor = require('./stepMotor');
+  StepMotor = require('./drivers/stepMotor');
 
   sleep = require('../../openbeelab-util/javascript/timeUtils').sleep;
 
