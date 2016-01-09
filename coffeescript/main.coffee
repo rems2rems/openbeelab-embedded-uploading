@@ -49,8 +49,8 @@ configDb.get config.stand_id
 
         measure =
             timestamp : new Date()
-            location : stand.location
-            beehouse : stand.beehouse
+            location_id : stand.location._id
+            beehouse_id : stand.beehouse._id
             stand_id : stand._id
             type : 'measure'
             name : sensor.name
