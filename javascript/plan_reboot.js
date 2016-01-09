@@ -6,6 +6,8 @@
 
   config = require('./config');
 
+  config.name = config.name + "_config";
+
   db = dbDriver.database(config);
 
   db.get(config.stand_id).then(function(stand) {
