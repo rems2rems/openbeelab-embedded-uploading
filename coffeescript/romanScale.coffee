@@ -1,6 +1,6 @@
 require('../../openbeelab-util/javascript/numberUtils').install()
-Pin = require './pin'
-StepMotor = require('./stepMotor')
+Pin = require './drivers/pin'
+StepMotor = require('./drivers/stepMotor')
 
 sleep = require('../../openbeelab-util/javascript/timeUtils').sleep
 

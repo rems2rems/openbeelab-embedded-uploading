@@ -34,21 +34,8 @@ configDb.get config.stand_id
     for sensor in stand.sensors when sensor.active
                 
         sensor.device = device
-        if device[sensor.process]?
-
-            measure = device[sensor.process]
-
-        else
-            
-            specificProcess = require './' + sensor.process
-            measure = specificProcess(sensor,device)[sensor.action]
-
-        value = measure(sensor,device)
-
-        console.log("measure:" + value)
 
         measure =
-            timestamp : new Date()
             location_id : stand.location._id
             beehouse_id : stand.beehouse._id
             stand_id : stand._id
@@ -58,6 +45,23 @@ configDb.get config.stand_id
             value : (value-sensor.bias)*sensor.gain
             unit : sensor.unit
 
+        if device[sensor.process]?
+
+            makeMeasure = device[sensor.process]
+
+        else
+            
+            specificProcess = require './' + sensor.process
+            makeMeasure = specificProcess(sensor,device)[sensor.action]
+
+        value = makeMeasure(sensor,device)
+
+        console.log("measure:" + value)
+
+        measure.raw_value = value
+        measure.value = (value-sensor.bias)*sensor.gain
+        measure.timestamp = new Date()
+            
         dataDb.save(measure).then (result)->
 
             console.log "measure uploaded to db " + dataDbOptions.name
