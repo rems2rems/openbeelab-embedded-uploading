@@ -38,7 +38,7 @@ module.exports = (device,pins) ->
         backward : (nbSteps=1) -> @move(-1*nbSteps)
         move : (nbSteps=1) ->
 
-            console.log "moving..."
+            #console.log "moving..."
 
             goForward = nbSteps > 0
             
