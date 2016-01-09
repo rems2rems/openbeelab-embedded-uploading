@@ -52,7 +52,6 @@
         if (nbSteps == null) {
           nbSteps = 1;
         }
-        console.log("moving...");
         goForward = nbSteps > 0;
         nbSteps = nbSteps.abs();
         direction.setValue(goForward);
