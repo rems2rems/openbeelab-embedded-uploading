@@ -22,6 +22,7 @@ _searchEquilibrium = (motor,photoDiode1,photoDiode2,pid)->
             nbSteps -= 1
             light1 = photoDiode1.getValue()
             light2 = photoDiode2.getValue()
+            console.log("light1=" + light1 "      light2=" + light2)
             deltaLight = light1 - light2
 
     until deltaLight < 10
@@ -30,6 +31,7 @@ _searchEquilibrium = (motor,photoDiode1,photoDiode2,pid)->
         nbSteps += 1
         light1 = photoDiode1.getValue()
         light2 = photoDiode2.getValue()
+        console.log("light1=" + light1 "      light2=" + light2)
         deltaLight = light1 - light2
 
     return nbSteps
