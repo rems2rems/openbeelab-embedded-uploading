@@ -2,24 +2,24 @@
 (function() {
   var Pin, sleep;
 
-  require('../../openbeelab-util/javascript/arrayUtils').install();
+  require('../../../openbeelab-util/javascript/arrayUtils').install();
 
-  require('../../openbeelab-util/javascript/numberUtils').install();
+  require('../../../openbeelab-util/javascript/numberUtils').install();
 
-  sleep = require('../../openbeelab-util/javascript/timeUtils').sleep;
+  sleep = require('../../../openbeelab-util/javascript/timeUtils').sleep;
 
   Pin = require('./pin');
 
-  module.exports = function(device, pins) {
+  module.exports = function(device, config) {
     var direction, enable, ms1, ms2, ms3, pulse, reset, sleepPin;
-    enable = Pin.buildGpio(device, pins.enable, 'out');
-    ms1 = Pin.buildGpio(device, pins.ms1, 'out');
-    ms2 = Pin.buildGpio(device, pins.ms2, 'out');
-    ms3 = Pin.buildGpio(device, pins.ms3, 'out');
-    pulse = Pin.buildGpio(device, pins.pulse, 'out');
-    direction = Pin.buildGpio(device, pins.direction, 'out');
-    sleepPin = Pin.buildGpio(device, pins.sleep, 'out');
-    reset = Pin.buildGpio(device, pins.reset, 'out');
+    enable = Pin.buildGpio(device, config.enable, 'out');
+    ms1 = Pin.buildGpio(device, config.ms1, 'out');
+    ms2 = Pin.buildGpio(device, config.ms2, 'out');
+    ms3 = Pin.buildGpio(device, config.ms3, 'out');
+    pulse = Pin.buildGpio(device, config.pulse, 'out');
+    direction = Pin.buildGpio(device, config.direction, 'out');
+    sleepPin = Pin.buildGpio(device, config.sleep, 'out');
+    reset = Pin.buildGpio(device, config.reset, 'out');
     ms1.setOff();
     ms2.setOff();
     ms3.setOff();
@@ -57,9 +57,9 @@
         direction.setValue(goForward);
         nbSteps.times(function() {
           pulse.setOn();
-          sleep(2);
+          sleep(config.stepDelay);
           pulse.setOff();
-          return sleep(2);
+          return sleep(config.stepDelay);
         });
       }
     };

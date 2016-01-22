@@ -2,9 +2,9 @@
 (function() {
   var config, db, dbDriver;
 
-  dbDriver = require('../../openbeelab-db-util/javascript/dbUtil');
+  dbDriver = require('../../../openbeelab-db-util/javascript/dbUtil');
 
-  config = require('./config');
+  config = require('../config');
 
   config.name = config.name + "_config";
 

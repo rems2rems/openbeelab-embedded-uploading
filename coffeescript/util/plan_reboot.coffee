@@ -1,8 +1,8 @@
-dbDriver = require '../../openbeelab-db-util/javascript/dbUtil'
-config = require './config'
+dbDriver = require '../../../openbeelab-db-util/javascript/dbDriver'
+config = require '../config'
 config.name = config.name + "_config"
 
-db = dbDriver.database(config)
+db = dbDriver.connectToServer(dbConfig.database).useDb(config.database.name + "_config")
 
 db.get config.stand_id
 .then (stand) ->

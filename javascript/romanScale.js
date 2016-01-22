@@ -20,22 +20,24 @@
     deltaLight = light1 - light2;
     nbSteps = 0;
     if (light2 > light1) {
+      console.log("trop loin. je recule...");
       while (!(deltaLight > 100)) {
         motor.backward();
         nbSteps -= 1;
         light1 = photoDiode1.getValue();
         light2 = photoDiode2.getValue();
-        console.log("light1=" + light1("      light2=" + light2));
+        console.log("light1=" + light1 + "      light2=" + light2);
         deltaLight = light1 - light2;
       }
     }
+    console.log("marche arriere terminée. j'avance...");
     while (!(deltaLight < 10)) {
       motor.forward();
       sleep(1025 - deltaLight.abs());
       nbSteps += 1;
       light1 = photoDiode1.getValue();
       light2 = photoDiode2.getValue();
-      console.log("light1=" + light1("      light2=" + light2));
+      console.log("light1=" + light1 + "      light2=" + light2);
       deltaLight = light1 - light2;
     }
     return nbSteps;
