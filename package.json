@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "mock-couch": "^0.1.6",
+    "must": "^0.13.1",
     "node-pid-controller": "^0.1.1"
   }
 }

@@ -2,13 +2,13 @@
 (function() {
   var config, db, dbDriver;
 
-  dbDriver = require('../../openbeelab-db-util/javascript/dbUtil');
+  dbDriver = require('../../../openbeelab-db-util/javascript/dbDriver');
 
-  config = require('./config');
+  config = require('../config');
 
   config.name = config.name + "_config";
 
-  db = dbDriver.database(config);
+  db = dbDriver.connectToServer(dbConfig.database).useDb(config.database.name + "_config");
 
   db.get(config.stand_id).then(function(stand) {
     var device;

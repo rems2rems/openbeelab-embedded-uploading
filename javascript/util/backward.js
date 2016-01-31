@@ -2,9 +2,9 @@
 (function() {
   var StepMotor, device, motor, pins;
 
-  StepMotor = require('./stepMotor');
+  StepMotor = require('../drivers/stepMotor');
 
-  device = require('./devices/arietta_g25');
+  device = require('../devices/arietta_g25');
 
   pins = {
     enable: 'J4.8',

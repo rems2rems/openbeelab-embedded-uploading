@@ -1,18 +1,18 @@
-require('../../openbeelab-util/javascript/arrayUtils').install()
-require('../../openbeelab-util/javascript/numberUtils').install()
-sleep = require('../../openbeelab-util/javascript/timeUtils').sleep
+require('../../../openbeelab-util/javascript/arrayUtils').install()
+require('../../../openbeelab-util/javascript/numberUtils').install()
+sleep = require('../../../openbeelab-util/javascript/timeUtils').sleep
 Pin = require './pin'
 
-module.exports = (device,pins) ->
+module.exports = (device,config) ->
 
-    enable = Pin.buildGpio(device,pins.enable,'out') #high pour moteur actif
-    ms1 = Pin.buildGpio(device,pins.ms1,'out') #microstep 1/2 pas
-    ms2 = Pin.buildGpio(device,pins.ms2,'out') #microstep 1/4 pas
-    ms3 = Pin.buildGpio(device,pins.ms3,'out') #microstep 1/16 pas si ms1 et ms2
-    pulse = Pin.buildGpio(device,pins.pulse,'out') #impulsions
-    direction = Pin.buildGpio(device,pins.direction,'out') #avant/arriere
-    sleepPin = Pin.buildGpio(device,pins.sleep,'out') #logique inversée
-    reset = Pin.buildGpio(device,pins.reset,'out') #logique inversée
+    enable = Pin.buildGpio(device,config.enable,'out') #high pour moteur actif
+    ms1 = Pin.buildGpio(device,config.ms1,'out') #microstep 1/2 pas
+    ms2 = Pin.buildGpio(device,config.ms2,'out') #microstep 1/4 pas
+    ms3 = Pin.buildGpio(device,config.ms3,'out') #microstep 1/16 pas si ms1 et ms2
+    pulse = Pin.buildGpio(device,config.pulse,'out') #impulsions
+    direction = Pin.buildGpio(device,config.direction,'out') #avant/arriere
+    sleepPin = Pin.buildGpio(device,config.sleep,'out') #logique inversée
+    reset = Pin.buildGpio(device,config.reset,'out') #logique inversée
 
     ms1.setOff()
     ms2.setOff()
@@ -49,9 +49,9 @@ module.exports = (device,pins) ->
             nbSteps.times ->
  
                 pulse.setOn()
-                sleep(2) # ms
+                sleep(config.stepDelay) # ms
                 pulse.setOff()
-                sleep(2)
+                sleep(config.stepDelay)
 
             return
     }

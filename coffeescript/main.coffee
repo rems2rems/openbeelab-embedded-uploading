@@ -1,30 +1,11 @@
 
-dbDriver = require '../../openbeelab-db-util/javascript/dbUtil'
 config = require './config'
+takeMeasure = require './takeMeasure'
+saveMeasure = require './saveMeasure'
 
-configDbOptions = 
-    host : config.host
-    protocol : config.protocol
-    port : config.port
-    auth:
-        username: config.auth.username
-        password: config.auth.password
-    name : config.name + "_config"
-
-configDb = dbDriver.database(configDbOptions)
-
-dataDbOptions = 
-    host : config.host
-    protocol : config.protocol
-    port : config.port
-    auth:
-        username: config.auth.username
-        password: config.auth.password
-    name : config.name + "_data"
-
-dataDb = dbDriver.database(dataDbOptions)
-
-insert_measure = require './insert_measure'
+dbDriver = require '../../openbeelab-db-util/javascript/dbDriver'
+configDb = dbDriver.connectToServer(dbConfig.database).useDb(config.database.name + "_config")
+dataDb = dbDriver.connectToServer(dbConfig.database).useDb(config.database.name + "_data")
 
 configDb.get config.stand_id
 .then (stand) ->
@@ -34,45 +15,18 @@ configDb.get config.stand_id
     for sensor in stand.sensors when sensor.active
                 
         sensor.device = device
+        
+        measure = takeMeasure(sensor)
+        
+        measure.location_id = stand.location._id
+        
+        if stand.beehouse._id?
+            measure.beehouse_id = stand.beehouse._id
+        
+        measure.stand_id = stand._id
 
-        measure =
-            location_id : stand.location._id
-            beehouse_id : stand.beehouse._id
-            stand_id : stand._id
-            type : 'measure'
-            name : sensor.name
-            raw_value : value
-            value : (value-sensor.bias)*sensor.gain
-            unit : sensor.unit
-
-        if device[sensor.process]?
-
-            makeMeasure = device[sensor.process]
-
-        else
-            
-            specificProcess = require './' + sensor.process
-            makeMeasure = specificProcess(sensor,device)[sensor.action]
-
-        value = makeMeasure(sensor,device)
-
-        console.log("measure:" + value)
-
-        measure.raw_value = value
-        measure.value = (value-sensor.bias)*sensor.gain
-        measure.timestamp = new Date()
-            
-        dataDb.save(measure).then (result)->
-
-            console.log "measure uploaded to db " + dataDbOptions.name
-            console.log "measure id:" + result._id
-            
-            dataDb.save({ _id : "_design/updates/_update/time/" + result._id })
-
-        .then () ->
-                
-            console.log "added server timestamp"
+        saveMeasure(measure,stand,dataDb)
 
 .catch (err)->
 
-    console.log err 
+    console.log err
