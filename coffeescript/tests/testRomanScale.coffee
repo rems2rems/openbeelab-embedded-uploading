@@ -17,4 +17,4 @@ describe "taking measure with a roman scale",->
         
         result = takeMeasure(sensor)
         expect(result).to.not.be.null()
-        result.raw_value.must.be.number()
+        result.raw_value.must.be.a.number()
