@@ -10,6 +10,11 @@ module.exports =
             raw_value : value
             value : (value-sensor.bias)*sensor.gain
             unit : sensor.unit
+            measureSource : "automatic"
+
+        if sensor.isRelative?
+
+            measure.absolute_ref = null
 
         if device[sensor.process]?
 

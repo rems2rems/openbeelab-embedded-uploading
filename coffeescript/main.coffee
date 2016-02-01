@@ -25,7 +25,7 @@ configDb.get config.stand_id
         
         measure.stand_id = stand._id
 
-        saveMeasure(measure,stand,dataDb)
+        saveMeasure(measure,dataDb)
 
 .catch (err)->
 

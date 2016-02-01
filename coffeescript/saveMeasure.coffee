@@ -1,6 +1,7 @@
-module.exports = (measure,stand,dataDb)->
+module.exports = (measure,dataDb)->
 
-    dataDb.save(measure).then (result)->
+    dataDb.save(measure)
+    .then (result)->
 
         console.log "measure uploaded to db " + dataDbOptions.name
         console.log "measure id:" + result._id
