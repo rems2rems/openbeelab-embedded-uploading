@@ -10,22 +10,22 @@ module.exports =
             raw_value : value
             value : (value-sensor.bias)*sensor.gain
             unit : sensor.unit
-            measureSource : "automatic"
+            measureOrigin : "automatic"
 
         if sensor.isRelative?
 
-            measure.absolute_ref = null
+            measure.absoluteSource = null
 
         if device[sensor.process]?
 
-            makeMeasure = device[sensor.process]
+            takeMeasure = device[sensor.process]
 
         else
             
             specificProcess = require './' + sensor.process
-            makeMeasure = specificProcess(sensor,device)[sensor.action]
+            takeMeasure = specificProcess(sensor,device)[sensor.action]
 
-        value = makeMeasure(sensor,device)
+        value = takeMeasure(sensor,device)
 
         console.log("measure:" + value)
 

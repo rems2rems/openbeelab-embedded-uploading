@@ -31,7 +31,7 @@
         measure.beehouse_id = stand.beehouse._id;
       }
       measure.stand_id = stand._id;
-      results.push(saveMeasure(measure, stand, dataDb));
+      results.push(saveMeasure(measure, dataDb));
     }
     return results;
   })["catch"](function(err) {

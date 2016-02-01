@@ -137,8 +137,6 @@
     }
   };
 
-  api.unexportAll();
-
   module.exports = api;
 
 }).call(this);

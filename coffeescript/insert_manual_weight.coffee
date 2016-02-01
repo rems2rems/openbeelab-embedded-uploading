@@ -17,7 +17,7 @@ configDb.get config.stand_id
         name : 'global-weight'
         value : weight
         unit : 'Kg'
-        measureSource : "manual"
+        measureOrigin : "manual"
         timestamp : new Date()
         location_id : stand.location_id
         beehouse_id : stand.beehouse_id
