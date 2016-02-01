@@ -6,9 +6,4 @@
 
 node /root/openbeelab-embedded-uploading/javascript/main.js
 
-echo chemin wakeup_ena `which wakeup_ena`
-if [ ! -f /sys/class/rtc/rtc0/wakealarm ]; then
-    echo "le chemin vers le fichier wakealarm n'existe pas!"
-fi
-
-node /root/openbeelab-embedded-uploading/javascript/plan_reboot.js
+node /root/openbeelab-embedded-uploading/javascript/util/plan_reboot.js

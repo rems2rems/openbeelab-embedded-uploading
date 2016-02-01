@@ -137,5 +137,5 @@ api =
 
         exec("shutdown -h now")
 
-api.unexportAll()
+#api.unexportAll()
 module.exports = api
